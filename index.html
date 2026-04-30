@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>아름다운길교회</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+
+<style>
+:root{
+  --bg:#080806;
+  --ink:#fff8ea;
+  --muted:#bfb5a3;
+  --paper:#f5ead7;
+  --dark:#17130d;
+  --gold:#e7bd6d;
+  --green:#7fd1a2;
+  --orange:#e77b4d;
+  --blue:#8aa7ff;
+  --line:rgba(255,248,234,.16);
+  --glass:rgba(255,248,234,.08);
+  --shadow:0 30px 100px rgba(0,0,0,.45);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Pretendard,system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  overflow:hidden;
+}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit}
+
+.noise{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:.045;
+  z-index:5;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.cursor{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
+  background:
+    radial-gradient(circle at var(--x,50%) var(--y,50%),rgba(231,189,109,.18),transparent 24%);
+}
+
+.topbar{
+  position:fixed;
+  left:50%;
+  top:20px;
+  transform:translateX(-50%);
+  width:min(1180px,calc(100% - 28px));
+  z-index:20;
+  height:72px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:rgba(8,8,6,.62);
+  backdrop-filter:blur(24px);
+  box-shadow:0 18px 70px rgba(0,0,0,.35);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 14px 0 22px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:22px;
+  font-weight:950;
+  letter-spacing:-.07em;
+}
+
+.brand-mark{
+  width:46px;
+  height:46px;
+  border-radius:18px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--gold),var(--orange));
+  color:#19130b;
+  box-shadow:0 0 35px rgba(231,189,109,.35);
+}
+
+.nav{
+  display:flex;
+  align-items:center;
+  gap:3px;
+  color:#eee2ce;
+  font-weight:850;
+  font-size:14px;
+}
+
+.nav a{
+  padding:11px 12px;
+  border-radius:999px;
+  opacity:.76;
+  transition:.25s;
+}
+.nav a.active,
+.nav a:hover{
+  opacity:1;
+  background:rgba(255,248,234,.1);
+}
+
+.mode{
+  border:0;
+  padding:12px 16px;
+  border-radius:999px;
+  background:var(--paper);
+  color:#1b160f;
+  font-weight:950;
+  cursor:pointer;
+}
+
+.progress{
+  position:fixed;
+  left:0;
+  bottom:0;
+  width:0%;
+  height:5px;
+  background:linear-gradient(90deg,var(--gold),var(--green),var(--blue));
+  z-index:50;
+}
+
+.gallery{
+  position:relative;
+  z-index:2;
+  height:100vh;
+  width:100vw;
+  overflow-x:auto;
+  overflow-y:hidden;
+  display:flex;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:none;
+}
+.gallery::-webkit-scrollbar{display:none}
+
+.panel{
+  min-width:100vw;
+  height:100vh;
+  scroll-snap-align:start;
+  position:relative;
+  padding:118px max(28px,calc((100vw - 1180px)/2)) 54px;
+  display:grid;
+  align-items:center;
+  overflow:hidden;
+}
+
+.panel::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-2;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(231,189,109,.12),transparent 30%),
+    radial-gradient(circle at 80% 70%,rgba(127,209,162,.08),transparent 32%);
+}
+
+.panel-number{
+  position:absolute;
+  right:max(28px,calc((100vw - 1180px)/2));
+  top:120px;
+  font-size:13px;
+  letter-spacing:.2em;
+  color:var(--gold);
+  font-weight:950;
+}
+
+.kicker{
+  display:inline-flex;
+  width:fit-content;
+  gap:8px;
+  align-items:center;
+  padding:10px 14px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:var(--glass);
+  color:#f8ead2;
+  font-size:13px;
+  font-weight:950;
+  letter-spacing:.08em;
+}
+
+h1{
+  margin:24px 0 24px;
+  font-size:clamp(58px,9vw,130px);
+  line-height:.82;
+  letter-spacing:-.11em;
+}
+
+h2{
+  margin:12px 0 22px;
+  font-size:clamp(44px,7vw,96px);
+  line-height:.86;
+  letter-spacing:-.1em;
+}
+
+.lead{
+  max-width:670px;
+  color:var(--muted);
+  font-size:19px;
+  line-height:1.85;
+  letter-spacing:-.025em;
+  font-weight:500;
+}
+
+.hero-grid{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:32px;
+  align-items:center;
+  width:min(1180px,100%);
+}
+
+.hero-card{
+  min-height:610px;
+  border-radius:52px;
+  border:1px solid var(--line);
+  background:
+    linear-gradient(180deg,rgba(8,8,6,.05),rgba(8,8,6,.85)),
+    url("https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&w=1500&q=80") center/cover;
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+}
+
+.ticket{
+  position:absolute;
+  left:24px;
+  right:24px;
+  bottom:24px;
+  padding:26px;
+  border-radius:34px;
+  background:rgba(8,8,6,.68);
+  border:1px solid rgba(255,248,234,.18);
+  backdrop-filter:blur(22px);
+}
+
+.ticket small{
+  color:var(--gold);
+  font-weight:950;
+  letter-spacing:.1em;
+}
+.ticket h3{
+  margin:14px 0 8px;
+  font-size:36px;
+  line-height:1;
+  letter-spacing:-.075em;
+}
+.ticket p{
+  margin:0;
+  color:var(--muted);
+  line-height:1.7;
+}
+
+.actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:34px;
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px 23px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:rgba(255,248,234,.08);
+  font-weight:950;
+  transition:.25s;
+}
+.btn.primary{
+  background:linear-gradient(135deg,var(--gold),var(--orange));
+  color:#17130d;
+  border:0;
+  box-shadow:0 20px 45px rgba(231,189,109,.25);
+}
+.btn:hover{
+  transform:translateY(-5px);
+}
+
+.scroll-hint{
+  margin-top:34px;
+  color:#8f8575;
+  font-size:14px;
+  font-weight:850;
+}
+
+.manifesto{
+  width:min(1180px,100%);
+  display:grid;
+  grid-template-columns:.9fr 1.1fr;
+  gap:34px;
+  align-items:center;
+}
+
+.text-wall{
+  padding:42px;
+  border-radius:42px;
+  border:1px solid var(--line);
+  background:rgba(255,248,234,.07);
+  backdrop-filter:blur(22px);
+  box-shadow:var(--shadow);
+}
+
+.text-wall p{
+  color:var(--muted);
+  font-size:18px;
+  line-height:1.9;
+  margin:0 0 18px;
+}
+
+.pillars{
+  display:grid;
+  gap:16px;
+}
+
+.pillar{
+  padding:24px;
+  border-radius:30px;
+  border:1px solid var(--line);
+  background:rgba(255,248,234,.07);
+  backdrop-filter:blur(18px);
+  transition:.25s;
+}
+.pillar:hover{
+  transform:translateX(8px);
+  background:rgba(255,248,234,.12);
+}
+.pillar span{
+  color:var(--gold);
+  font-weight:950;
+}
+.pillar h3{
+  margin:10px 0 8px;
+  font-size:28px;
+  letter-spacing:-.07em;
+}
+.pillar p{
+  margin:0;
+  color:var(--muted);
+  line-height:1.7;
+}
+
+.vision-map{
+  width:min(1180px,100%);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:28px;
+  align-items:center;
+}
+
+.orbit{
+  min-height:560px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  position:relative;
+  background:
+    radial-gradient(circle at center,rgba(231,189,109,.22),transparent 22%),
+    radial-gradient(circle at center,transparent 40%,rgba(255,248,234,.08) 41%,transparent 42%),
+    radial-gradient(circle at center,transparent 62%,rgba(255,248,234,.1) 63%,transparent 64%);
+}
+
+.orbit-center{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:190px;
+  height:190px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  font-size:26px;
+  line-height:1.1;
+  letter-spacing:-.07em;
+  font-weight:950;
+  background:linear-gradient(135deg,var(--gold),var(--orange));
+  color:#17130d;
+}
+
+.planet{
+  position:absolute;
+  width:126px;
+  height:126px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:18px;
+  font-weight:950;
+  background:rgba(255,248,234,.1);
+  border:1px solid var(--line);
+  backdrop-filter:blur(18px);
+}
+.planet:nth-child(2){left:8%;top:18%}
+.planet:nth-child(3){right:5%;top:25%}
+.planet:nth-child(4){left:16%;bottom:12%}
+.planet:nth-child(5){right:18%;bottom:10%}
+
+.pastor-layout{
+  width:min(1180px,100%);
+  display:grid;
+  grid-template-columns:.8fr 1.2fr;
+  gap:32px;
+  align-items:center;
+}
+
+.pastor-photo{
+  min-height:610px;
+  border-radius:999px 999px 42px 42px;
+  background:
+    linear-gradient(180deg,rgba(8,8,6,.06),rgba(8,8,6,.55)),
+    url("https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?auto=format&fit=crop&w=1000&q=80") center/cover;
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+}
+
+.quote{
+  font-size:clamp(34px,5vw,72px);
+  line-height:1.06;
+  letter-spacing:-.09em;
+  margin-bottom:28px;
+}
+.pastor-copy p{
+  color:var(--muted);
+  font-size:18px;
+  line-height:1.9;
+}
+.sign{
+  margin-top:28px;
+  color:var(--gold);
+  font-size:24px;
+  font-weight:950;
+}
+
+.board{
+  width:min(1180px,100%);
+  border:1px solid var(--line);
+  border-radius:42px;
+  overflow:hidden;
+  background:rgba(255,248,234,.07);
+  backdrop-filter:blur(22px);
+  box-shadow:var(--shadow);
+}
+
+.board-row{
+  display:grid;
+  grid-template-columns:180px 1fr 220px;
+  align-items:center;
+  border-bottom:1px solid var(--line);
+}
+.board-row:last-child{border-bottom:0}
+.board-row > div{
+  padding:28px;
+  border-right:1px solid var(--line);
+}
+.board-row > div:last-child{border-right:0}
+.day{
+  color:var(--gold);
+  font-size:28px;
+  font-weight:950;
+}
+.worship-name{
+  font-size:34px;
+  letter-spacing:-.075em;
+  font-weight:950;
+}
+.time{
+  color:var(--green);
+  font-size:22px;
+  text-align:right;
+  font-weight:950;
+}
+
+.media-layout{
+  width:min(1180px,100%);
+  display:grid;
+  grid-template-columns:1.3fr .7fr;
+  gap:24px;
+}
+
+.youtube{
+  aspect-ratio:16/9;
+  border-radius:42px;
+  overflow:hidden;
+  background:#000;
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+}
+.youtube iframe{
+  width:100%;
+  height:100%;
+  border:0;
+}
+
+.notice-stack{
+  display:grid;
+  gap:14px;
+}
+
+.notice{
+  padding:22px;
+  border-radius:28px;
+  border:1px solid var(--line);
+  background:rgba(255,248,234,.08);
+  backdrop-filter:blur(18px);
+  transition:.25s;
+}
+.notice:hover{
+  transform:translateY(-6px);
+  background:rgba(255,248,234,.13);
+}
+.notice b{
+  display:block;
+  margin-bottom:8px;
+  font-size:20px;
+  letter-spacing:-.05em;
+}
+.notice span{
+  color:var(--muted);
+  font-size:14px;
+}
+
+.location-layout{
+  width:min(1180px,100%);
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:24px;
+}
+
+.map{
+  min-height:520px;
+  border-radius:42px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+}
+.map iframe{
+  width:100%;
+  height:100%;
+  border:0;
+}
+
+.location-card{
+  padding:42px;
+  border-radius:42px;
+  background:var(--paper);
+  color:#17130d;
+  box-shadow:var(--shadow);
+}
+.location-card h3{
+  margin:0 0 18px;
+  font-size:54px;
+  line-height:.95;
+  letter-spacing:-.09em;
+}
+.location-card p{
+  color:#645747;
+  line-height:1.85;
+  font-weight:650;
+}
+
+.footer-panel{
+  width:min(1180px,100%);
+  text-align:center;
+  color:var(--muted);
+}
+.footer-panel b{
+  color:var(--ink);
+  font-size:24px;
+}
+
+.reveal{
+  opacity:0;
+  transform:translateY(30px);
+  transition:.8s ease;
+}
+.reveal.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+body.light{
+  --bg:#efe8dc;
+  --ink:#15120d;
+  --muted:#62594c;
+  --line:rgba(21,18,13,.18);
+  --glass:rgba(255,255,255,.46);
+}
+body.light .topbar{
+  background:rgba(245,234,215,.7);
+}
+body.light .nav a:hover,
+body.light .nav a.active{
+  background:rgba(21,18,13,.08);
+}
+body.light .ticket,
+body.light .text-wall,
+body.light .pillar,
+body.light .board,
+body.light .notice{
+  background:rgba(255,255,255,.55);
+}
+body.light .hero-card,
+body.light .pastor-photo{
+  color:#fff8ea;
+}
+
+@media(max-width:980px){
+  body{
+    overflow:auto;
+  }
+  .topbar{
+    position:sticky;
+    top:10px;
+    transform:none;
+    left:auto;
+    margin:10px auto 0;
+    width:calc(100% - 20px);
+    height:auto;
+    border-radius:30px;
+    align-items:flex-start;
+    gap:12px;
+    flex-wrap:wrap;
+    padding:14px;
+  }
+  .brand{
+    font-size:19px;
+  }
+  .nav{
+    order:3;
+    width:100%;
+    overflow:auto;
+    padding-bottom:3px;
+  }
+  .nav a{
+    white-space:nowrap;
+  }
+  .gallery{
+    height:auto;
+    overflow:visible;
+    display:block;
+  }
+  .panel{
+    min-width:0;
+    width:100%;
+    min-height:100vh;
+    height:auto;
+    padding:72px 18px;
+  }
+  .panel-number{
+    display:none;
+  }
+  .hero-grid,
+  .manifesto,
+  .vision-map,
+  .pastor-layout,
+  .media-layout,
+  .location-layout{
+    grid-template-columns:1fr;
+  }
+  .hero-card,
+  .pastor-photo{
+    min-height:460px;
+  }
+  .orbit{
+    min-height:440px;
+  }
+}
+
+@media(max-width:640px){
+  h1{font-size:58px}
+  h2{font-size:46px}
+  .lead{font-size:16px}
+  .hero-card{
+    border-radius:34px;
+  }
+  .ticket{
+    left:16px;
+    right:16px;
+    bottom:16px;
+    padding:20px;
+  }
+  .ticket h3{
+    font-size:29px;
+  }
+  .orbit{
+    border-radius:34px;
+    min-height:520px;
+  }
+  .orbit-center{
+    position:relative;
+    left:auto;
+    top:auto;
+    transform:none;
+    margin:24px auto;
+  }
+  .planet{
+    position:relative;
+    left:auto!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:auto!important;
+    width:auto;
+    height:auto;
+    border-radius:24px;
+    margin:12px 18px;
+  }
+  .board-row{
+    grid-template-columns:1fr;
+  }
+  .board-row > div{
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+  .board-row > div:last-child{
+    border-bottom:0;
+  }
+  .time{
+    text-align:left;
+  }
+  .map{
+    min-height:340px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="noise"></div>
+<div class="cursor"></div>
+<div class="progress" id="progress"></div>
+
+<header class="topbar">
+  <a class="brand" href="#home">
+    <span class="brand-mark">✦</span>
+    아름다운길교회
+  </a>
+
+  <nav class="nav" id="nav">
+    <a href="#home" class="active">홈</a>
+    <a href="#about">교회소개</a>
+    <a href="#vision">교회비전</a>
+    <a href="#pastor">담임목사</a>
+    <a href="#worship">예배안내</a>
+    <a href="#media">유튜브</a>
+    <a href="#location">오시는 길</a>
+  </nav>
+
+  <button class="mode" onclick="toggleMode()">낮/밤</button>
+</header>
+
+<main class="gallery" id="gallery">
+
+  <section class="panel" id="home" data-title="홈">
+    <div class="panel-number">EXHIBIT 00</div>
+    <div class="hero-grid">
+      <div class="reveal">
+        <span class="kicker">A CHURCH AS A GALLERY OF GRACE</span>
+        <h1>은혜를<br>전시하는<br>교회</h1>
+        <p class="lead">
+          아름다운길교회는 예배와 말씀, 공동체와 섬김을 통해
+          한 사람의 삶이 하나님의 은혜로 새로워지는 길을 함께 걷습니다.
+        </p>
+
+        <div class="actions">
+          <a class="btn primary" href="#worship">예배 시간 보기</a>
+          <a class="btn" href="#location">처음 오셨나요?</a>
+        </div>
+
+        <div class="scroll-hint">데스크톱에서는 마우스 휠로 옆으로 이동합니다 →</div>
+      </div>
+
+      <div class="hero-card reveal">
+        <div class="ticket">
+          <small>NEXT WORSHIP</small>
+          <h3>주일예배 · 오전 11:00</h3>
+          <p>이번 주 말씀: 은혜로 사는 삶 · 에베소서 2:8-10</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="about" data-title="교회소개">
+    <div class="panel-number">EXHIBIT 01</div>
+    <div class="manifesto">
+      <div class="reveal">
+        <span class="kicker">ABOUT CHURCH</span>
+        <h2>교회소개</h2>
+        <p class="lead">
+          교회는 건물이 아니라, 은혜가 필요한 사람들이 함께 하나님을 바라보는 공동체입니다.
+        </p>
+      </div>
+
+      <div class="text-wall reveal">
+        <p>
+          아름다운길교회는 처음 방문한 분도 편안히 머물 수 있는 따뜻한 교회를 지향합니다.
+          예배 안에서 하나님을 만나고, 말씀 안에서 삶의 방향을 발견하며,
+          서로의 삶을 위해 기도합니다.
+        </p>
+        <p>
+          우리는 주일의 감동에 머무르지 않고, 가정과 일터와 학교에서 복음의 빛을 살아내는
+          일상의 예배자를 세워갑니다.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="vision" data-title="교회비전">
+    <div class="panel-number">EXHIBIT 02</div>
+    <div class="vision-map">
+      <div class="orbit reveal">
+        <div class="orbit-center">예배에서<br>삶으로</div>
+        <div class="planet">예배의 회복</div>
+        <div class="planet">말씀의 깊이</div>
+        <div class="planet">다음세대</div>
+        <div class="planet">지역 섬김</div>
+      </div>
+
+      <div class="pillars reveal">
+        <span class="kicker">OUR VISION</span>
+        <h2>교회비전</h2>
+
+        <div class="pillar">
+          <span>01</span>
+          <h3>예배의 회복</h3>
+          <p>하나님의 임재를 사모하며 삶 전체가 예배가 되도록 돕습니다.</p>
+        </div>
+
+        <div class="pillar">
+          <span>02</span>
+          <h3>가정과 다음세대</h3>
+          <p>부모와 자녀, 청년과 아이들이 복음 안에서 건강하게 자라도록 섬깁니다.</p>
+        </div>
+
+        <div class="pillar">
+          <span>03</span>
+          <h3>도시를 섬기는 교회</h3>
+          <p>이웃의 필요를 살피고 지역사회에 하나님의 사랑을 흘려보냅니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="pastor" data-title="담임목사">
+    <div class="panel-number">EXHIBIT 03</div>
+    <div class="pastor-layout">
+      <div class="pastor-photo reveal"></div>
+
+      <div class="pastor-copy reveal">
+        <span class="kicker">PASTOR MESSAGE</span>
+        <div class="quote">
+          “교회는 완벽한 사람들이 아니라, 은혜가 필요한 사람들이 함께 걷는 길입니다.”
+        </div>
+        <p>
+          아름다운길교회 홈페이지를 방문해주신 여러분을 진심으로 환영합니다.
+          이곳에서 예배의 기쁨을 회복하고, 말씀 안에서 삶의 방향을 발견하며,
+          공동체 안에서 다시 일어나는 은혜를 경험하시길 축복합니다.
+        </p>
+        <div class="sign">담임목사 김아름</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="worship" data-title="예배안내">
+    <div class="panel-number">EXHIBIT 04</div>
+    <div>
+      <div class="reveal">
+        <span class="kicker">WORSHIP GUIDE</span>
+        <h2>예배안내</h2>
+        <p class="lead">모든 예배는 누구에게나 열려 있습니다. 처음 방문하시는 분도 편안히 함께하실 수 있습니다.</p>
+      </div>
+
+      <div class="board reveal">
+        <div class="board-row">
+          <div class="day">SUN</div>
+          <div class="worship-name">주일 1부 예배</div>
+          <div class="time">오전 9:00</div>
+        </div>
+        <div class="board-row">
+          <div class="day">SUN</div>
+          <div class="worship-name">주일 2부 예배</div>
+          <div class="time">오전 11:00</div>
+        </div>
+        <div class="board-row">
+          <div class="day">WED</div>
+          <div class="worship-name">수요기도회</div>
+          <div class="time">오후 7:30</div>
+        </div>
+        <div class="board-row">
+          <div class="day">DAWN</div>
+          <div class="worship-name">새벽기도회</div>
+          <div class="time">화-금 오전 5:30</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="media" data-title="유튜브">
+    <div class="panel-number">EXHIBIT 05</div>
+    <div>
+      <div class="reveal">
+        <span class="kicker">MEDIA & NOTICE</span>
+        <h2>교회유튜브<br>공지사항</h2>
+      </div>
+
+      <div class="media-layout reveal">
+        <div class="youtube">
+          <iframe src="https://www.youtube.com/embed/live_stream?channel=UC_x5XG1OV2P6uZZ5FSM9Ttw" allowfullscreen></iframe>
+        </div>
+
+        <div class="notice-stack">
+          <a class="notice" href="#">
+            <b>새가족 환영 모임 안내</b>
+            <span>2026.04.27 · 주일 예배 후</span>
+          </a>
+          <a class="notice" href="#">
+            <b>다음세대 여름수련회 신청</b>
+            <span>2026.04.20 · 온라인 신청</span>
+          </a>
+          <a class="notice" href="#">
+            <b>주일 차량 운행 시간 변경</b>
+            <span>2026.04.13 · 셔틀 시간 변경</span>
+          </a>
+          <a class="notice" href="#">
+            <b>금요기도회 특별집회</b>
+            <span>2026.04.06 · 본당</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="location" data-title="오시는 길">
+    <div class="panel-number">EXHIBIT 06</div>
+    <div class="location-layout">
+      <div class="map reveal">
+        <iframe src="https://maps.google.com/maps?q=Seoul%20Korea&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
+      </div>
+
+      <div class="location-card reveal">
+        <span class="kicker" style="color:#7c5524;border-color:rgba(23,19,13,.18);background:rgba(23,19,13,.05)">LOCATION</span>
+        <h3>아름다운길교회</h3>
+        <p>
+          주소: 서울특별시 은평구 은혜로 123<br>
+          전화: 02-123-4567<br>
+          이메일: church@example.com
+        </p>
+        <div class="actions">
+          <a class="btn primary" href="#worship">예배 시간 확인</a>
+          <a class="btn" style="color:#17130d;border-color:rgba(23,19,13,.18)" href="mailto:church@example.com">문의하기</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+const gallery = document.getElementById("gallery");
+const progress = document.getElementById("progress");
+const navLinks = document.querySelectorAll("#nav a");
+const panels = document.querySelectorAll(".panel");
+
+function isDesktop(){
+  return window.matchMedia("(min-width: 981px)").matches;
+}
+
+gallery.addEventListener("wheel", function(e){
+  if(!isDesktop()) return;
+  e.preventDefault();
+  gallery.scrollLeft += e.deltaY;
+}, { passive:false });
+
+function updateProgress(){
+  if(isDesktop()){
+    const max = gallery.scrollWidth - gallery.clientWidth;
+    const percent = max ? (gallery.scrollLeft / max) * 100 : 0;
+    progress.style.width = percent + "%";
+  }else{
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - doc.clientHeight;
+    const percent = max ? (doc.scrollTop / max) * 100 : 0;
+    progress.style.width = percent + "%";
+  }
+}
+
+gallery.addEventListener("scroll", updateProgress);
+window.addEventListener("scroll", updateProgress);
+
+navLinks.forEach(link=>{
+  link.addEventListener("click", e=>{
+    const id = link.getAttribute("href");
+    const target = document.querySelector(id);
+    if(!target) return;
+
+    if(isDesktop()){
+      e.preventDefault();
+      gallery.scrollTo({
+        left: target.offsetLeft,
+        behavior:"smooth"
+      });
+    }
+  });
+});
+
+function setActive(){
+  let current = panels[0].id;
+
+  panels.forEach(panel=>{
+    const rect = panel.getBoundingClientRect();
+    if(isDesktop()){
+      const center = window.innerWidth / 2;
+      if(rect.left <= center && rect.right >= center) current = panel.id;
+    }else{
+      if(rect.top <= 160 && rect.bottom >= 160) current = panel.id;
+    }
+  });
+
+  navLinks.forEach(link=>{
+    link.classList.toggle("active", link.getAttribute("href") === "#" + current);
+  });
+}
+
+gallery.addEventListener("scroll", setActive);
+window.addEventListener("scroll", setActive);
+
+function toggleMode(){
+  document.body.classList.toggle("light");
+}
+
+document.addEventListener("mousemove", e=>{
+  document.documentElement.style.setProperty("--x", e.clientX + "px");
+  document.documentElement.style.setProperty("--y", e.clientY + "px");
+});
+
+const revealObserver = new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add("show");
+    }
+  });
+},{ threshold:.15 });
+
+document.querySelectorAll(".reveal").forEach(el=>revealObserver.observe(el));
+
+updateProgress();
+setActive();
+</script>
+
+</body>
+</html>
